@@ -1,73 +1,81 @@
 import Foundation
 import FamilyControls
-import ManagedSettings
+import DeviceActivity
 
-/// Owns the user's app selection and the shield store. Shared by the UI and the App Intents,
-/// which run in the app's process, so plain UserDefaults is enough for persistence.
+/// The app-side owner of `LockSettings`, shared by the UI and the App Intents (which run in the
+/// app's process).
 ///
-/// Invariant: the shield store is a pure function of `isEngaged` and `selection`, and
-/// `syncShield()` is its only writer.
+/// Invariants, both re-derived on launch because the system keeps them across launches:
+/// - the shield store is `settings.applyShield(at: now)`, rewritten on every settings change and
+///   by the monitor extension at each schedule boundary;
+/// - DeviceActivity monitors exactly the schedule's windows, or nothing when the schedule is off
+///   or registering any window failed.
 @MainActor
 final class FoldLockController: ObservableObject {
     static let shared = FoldLockController()
 
-    private let store = ManagedSettingsStore(named: ManagedSettingsStore.Name("foldLock"))
-    private let defaults = UserDefaults.standard
-    private let selectionKey = "foldLock.selection"
-    private let engagedKey = "foldLock.engaged"
-
-    @Published var selection: FamilyActivitySelection {
+    @Published private(set) var settings: LockSettings {
         didSet {
-            if let data = try? JSONEncoder().encode(selection) {
-                defaults.set(data, forKey: selectionKey)
-            }
-            syncShield()
+            settings.save()
+            settings.applyShield(at: .now)
+            if settings.schedule != oldValue.schedule { updateMonitoring() }
         }
     }
-    @Published private(set) var isEngaged: Bool {
-        didSet {
-            defaults.set(isEngaged, forKey: engagedKey)
-            syncShield()
-        }
-    }
+    @Published private(set) var scheduleError: String?
     @Published private(set) var lastEvent: String?
 
+    var selection: FamilyActivitySelection {
+        get { settings.selection }
+        set { settings.selection = newValue }
+    }
+    var schedule: LockSchedule {
+        get { settings.schedule }
+        set { settings.schedule = newValue }
+    }
     var selectedCount: Int {
         selection.applicationTokens.count + selection.categoryTokens.count + selection.webDomainTokens.count
     }
 
     private init() {
-        if let data = defaults.data(forKey: selectionKey),
-           let saved = try? JSONDecoder().decode(FamilyActivitySelection.self, from: data) {
-            selection = saved
-        } else {
-            selection = FamilyActivitySelection()
-        }
-        isEngaged = defaults.bool(forKey: engagedKey)
-        // The store outlives this process; re-derive it in case it drifted while we weren't running.
-        syncShield()
+        settings = .load()
+        sync()
     }
 
     func engage(source: String) {
-        isEngaged = true
+        settings.isEngaged = true
         log("Engaged", source)
     }
 
     func release(source: String) {
-        isEngaged = false
+        settings.isEngaged = false
         log("Released", source)
     }
 
-    /// Writes the store from current state. Also call after Screen Time authorization is granted,
-    /// since writes made before then don't take effect.
-    func syncShield() {
-        guard isEngaged else {
-            store.clearAllSettings()
-            return
+    /// Rewrites the shield and schedule monitoring from current settings. Also call after Screen
+    /// Time authorization is granted, since both are ignored or rejected before then.
+    func sync() {
+        settings.applyShield(at: .now)
+        updateMonitoring()
+    }
+
+    private func updateMonitoring() {
+        let center = DeviceActivityCenter()
+        center.stopMonitoring()
+        scheduleError = nil
+        guard schedule.isEnabled else { return }
+        do {
+            for day in schedule.weekdays.sorted() {
+                let endDay = schedule.isOvernight ? day % 7 + 1 : day
+                try center.startMonitoring(DeviceActivityName("schedule.\(day)"), during: DeviceActivitySchedule(
+                    intervalStart: DateComponents(hour: schedule.start / 60, minute: schedule.start % 60, weekday: day),
+                    intervalEnd: DateComponents(hour: schedule.end / 60, minute: schedule.end % 60, weekday: endDay),
+                    repeats: true
+                ))
+            }
+        } catch {
+            center.stopMonitoring()
+            scheduleError = error.localizedDescription
         }
-        store.shield.applications = selection.applicationTokens.isEmpty ? nil : selection.applicationTokens
-        store.shield.applicationCategories = selection.categoryTokens.isEmpty ? nil : .specific(selection.categoryTokens)
-        store.shield.webDomains = selection.webDomainTokens.isEmpty ? nil : selection.webDomainTokens
     }
 
     private func log(_ action: String, _ source: String) {

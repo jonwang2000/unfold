@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B10000000000000000000001 /* ShieldConfig.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* ShieldConfig.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B10000000000000000000002 /* ScheduleMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* ScheduleMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -17,6 +18,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = E20000000000000000000001;
 			remoteInfo = ShieldConfig;
+		};
+		C10000000000000000000002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F00000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E30000000000000000000001;
+			remoteInfo = ScheduleMonitor;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -28,6 +36,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				B10000000000000000000001 /* ShieldConfig.appex in Embed Foundation Extensions */,
+				B10000000000000000000002 /* ScheduleMonitor.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -37,8 +46,11 @@
 /* Begin PBXFileReference section */
 		A20000000000000000000001 /* DuoFoldControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuoFoldControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20000000000000000000002 /* ShieldConfig.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShieldConfig.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		A30000000000000000000001 /* FamilyControls.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FamilyControls.entitlements; sourceTree = "<group>"; };
+		A30000000000000000000001 /* Unfold.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Unfold.entitlements; sourceTree = "<group>"; };
 		A30000000000000000000002 /* ShieldConfig-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ShieldConfig-Info.plist"; sourceTree = "<group>"; };
+		A20000000000000000000003 /* ScheduleMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ScheduleMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A30000000000000000000004 /* ShieldConfig.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShieldConfig.entitlements; sourceTree = "<group>"; };
+		A30000000000000000000003 /* ScheduleMonitor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ScheduleMonitor-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -50,6 +62,16 @@
 		A10000000000000000000002 /* ShieldConfig */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ShieldConfig;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000003 /* ScheduleMonitor */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ScheduleMonitor;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000004 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -69,6 +91,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D30000000000000000000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -77,6 +106,8 @@
 			children = (
 				A10000000000000000000001 /* DuoFoldControl */,
 				A10000000000000000000002 /* ShieldConfig */,
+				A10000000000000000000003 /* ScheduleMonitor */,
+				A10000000000000000000004 /* Shared */,
 				A00000000000000000000003 /* Config */,
 				A00000000000000000000002 /* Products */,
 			);
@@ -87,6 +118,7 @@
 			children = (
 				A20000000000000000000001 /* DuoFoldControl.app */,
 				A20000000000000000000002 /* ShieldConfig.appex */,
+				A20000000000000000000003 /* ScheduleMonitor.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -94,8 +126,10 @@
 		A00000000000000000000003 /* Config */ = {
 			isa = PBXGroup;
 			children = (
-				A30000000000000000000001 /* FamilyControls.entitlements */,
+				A30000000000000000000001 /* Unfold.entitlements */,
 				A30000000000000000000002 /* ShieldConfig-Info.plist */,
+				A30000000000000000000003 /* ScheduleMonitor-Info.plist */,
+				A30000000000000000000004 /* ShieldConfig.entitlements */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -116,9 +150,11 @@
 			);
 			dependencies = (
 				C20000000000000000000001 /* PBXTargetDependency */,
+				C20000000000000000000002 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A10000000000000000000001 /* DuoFoldControl */,
+				A10000000000000000000004 /* Shared */,
 			);
 			name = DuoFoldControl;
 			productName = DuoFoldControl;
@@ -145,6 +181,27 @@
 			productReference = A20000000000000000000002 /* ShieldConfig.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		E30000000000000000000001 /* ScheduleMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 910000000000000000000004 /* Build configuration list for PBXNativeTarget "ScheduleMonitor" */;
+			buildPhases = (
+				D30000000000000000000001 /* Sources */,
+				D30000000000000000000002 /* Frameworks */,
+				D30000000000000000000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A10000000000000000000003 /* ScheduleMonitor */,
+				A10000000000000000000004 /* Shared */,
+			);
+			name = ScheduleMonitor;
+			productName = ScheduleMonitor;
+			productReference = A20000000000000000000003 /* ScheduleMonitor.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -159,6 +216,9 @@
 						CreatedOnToolsVersion = 27.2;
 					};
 					E20000000000000000000001 = {
+						CreatedOnToolsVersion = 27.2;
+					};
+					E30000000000000000000001 = {
 						CreatedOnToolsVersion = 27.2;
 					};
 				};
@@ -179,6 +239,7 @@
 			targets = (
 				E10000000000000000000001 /* DuoFoldControl */,
 				E20000000000000000000001 /* ShieldConfig */,
+				E30000000000000000000001 /* ScheduleMonitor */,
 			);
 		};
 /* End PBXProject section */
@@ -192,6 +253,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		D20000000000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D30000000000000000000003 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -215,6 +283,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D30000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -222,6 +297,11 @@
 			isa = PBXTargetDependency;
 			target = E20000000000000000000001 /* ShieldConfig */;
 			targetProxy = C10000000000000000000001 /* PBXContainerItemProxy */;
+		};
+		C20000000000000000000002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E30000000000000000000001 /* ScheduleMonitor */;
+			targetProxy = C10000000000000000000002 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -276,7 +356,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Config/FamilyControls.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Config/Unfold.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = V2FBD67YG2;
@@ -304,7 +384,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Config/FamilyControls.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Config/Unfold.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = V2FBD67YG2;
@@ -332,7 +412,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
-				CODE_SIGN_ENTITLEMENTS = Config/FamilyControls.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Config/ShieldConfig.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = V2FBD67YG2;
@@ -358,7 +438,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
-				CODE_SIGN_ENTITLEMENTS = Config/FamilyControls.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Config/ShieldConfig.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = V2FBD67YG2;
@@ -372,6 +452,58 @@
 				);
 				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jonathanwang.DuoFoldControl.ShieldConfig;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		950000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = Config/Unfold.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = V2FBD67YG2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/ScheduleMonitor-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = ScheduleMonitor;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jonathanwang.DuoFoldControl.ScheduleMonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		950000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = Config/Unfold.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = V2FBD67YG2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/ScheduleMonitor-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = ScheduleMonitor;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jonathanwang.DuoFoldControl.ScheduleMonitor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -406,6 +538,15 @@
 			buildConfigurations = (
 				940000000000000000000001 /* Debug */,
 				940000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		910000000000000000000004 /* Build configuration list for PBXNativeTarget "ScheduleMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				950000000000000000000001 /* Debug */,
+				950000000000000000000002 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
