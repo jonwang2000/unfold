@@ -42,12 +42,6 @@
             ReferencedContainer = "container:DuoFoldControl.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <CommandLineArguments>
-         <CommandLineArgument
-            argument = "-UnfoldDebug YES"
-            isEnabled = "YES">
-         </CommandLineArgument>
-      </CommandLineArguments>
    </LaunchAction>
    <ArchiveAction
       buildConfiguration = "Release"

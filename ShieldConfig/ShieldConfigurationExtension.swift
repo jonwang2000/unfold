@@ -27,7 +27,9 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
             title: .init(text: "Unfold to view", color: .label),
             subtitle: .init(text: "\(name ?? "This app") is locked while your iPhone is folded.", color: .secondaryLabel),
             primaryButtonLabel: .init(text: "OK", color: .white),
-            primaryButtonBackgroundColor: .systemBlue
+            primaryButtonBackgroundColor: .systemBlue,
+            // Handled by the ShieldAction extension, which sends a notification that opens Unfold.
+            secondaryButtonLabel: .init(text: "Flap Unlock", color: .systemBlue)
         )
     }
 }

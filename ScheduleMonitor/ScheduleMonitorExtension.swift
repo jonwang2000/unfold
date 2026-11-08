@@ -1,7 +1,8 @@
 import DeviceActivity
 import Foundation
 
-/// Re-applies the shield when a scheduled window opens or closes, since the app may not be running.
+/// Re-applies the shield when a scheduled window or a Flap Unlock opens or closes, since the app
+/// may not be running.
 class ScheduleMonitorExtension: DeviceActivityMonitor {
     override func intervalDidStart(for activity: DeviceActivityName) {
         reapply()

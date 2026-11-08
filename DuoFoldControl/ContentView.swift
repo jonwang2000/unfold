@@ -7,86 +7,132 @@ struct ContentView: View {
     @State private var hinge: DeviceHinge?
     @State private var authError: String?
     @State private var showPicker = false
+    @State private var isFlapping = false
 
-    /// Pass `-UnfoldDebug YES` as a launch argument (enabled in the shared scheme) to show developer tools.
-    private let showsDebug = UserDefaults.standard.bool(forKey: "UnfoldDebug")
+    /// Developer tools show in every Debug build (what Xcode and `devicectl` install), however
+    /// the app is opened, and never in Release.
+    #if DEBUG
+    private let showsDebug = true
+    #else
+    private let showsDebug = false
+    #endif
 
     var body: some View {
         NavigationStack {
-            List {
-                Section { statusHeader }
+            // Re-evaluated every minute so the status and the settings lock follow the schedule
+            // while Unfold stays open.
+            TimelineView(.everyMinute) { context in
+                let isLocked = controller.settings.isLocking(at: context.date)
+                List {
+                    statusHeader(at: context.date, isLocked: isLocked)
 
-                if !isAuthorized {
+                    if !isAuthorized {
+                        Section {
+                            Button("Allow Screen Time Access") { Task { await requestAuthorization() } }
+                        } footer: {
+                            Text(authError ?? "Unfold uses Screen Time to lock the apps you choose.")
+                        }
+                    }
+
+                    // Settings only change while apps are unlocked, so they can't be used to escape.
+                    Group {
+                        Section {
+                            Button { showPicker = true } label: {
+                                LabeledContent("Apps to Lock", value: controller.selectedCount == 0 ? "None" : "\(controller.selectedCount) selected")
+                            }
+                        } footer: {
+                            Text(isLocked ? "Settings can only be changed while your apps are unlocked." : "These stay locked while your phone is folded.")
+                        }
+                        scheduleSection
+                        flapRuleSection
+                    }
+                    .disabled(isLocked)
+
                     Section {
-                        Button("Allow Screen Time Access") { Task { await requestAuthorization() } }
-                    } footer: {
-                        Text(authError ?? "Unfold uses Screen Time to lock the apps you choose.")
+                        Text("""
+                        In Shortcuts, tap Automation → + → Display → Opened or Closed, and set each to Run Immediately:
+                        • Closed → Lock Apps
+                        • Opened → Unlock Apps
+                        """)
+                        .font(.footnote)
+                    } header: {
+                        Text("Lock Automatically When Folded")
                     }
+
+                    if showsDebug { debugSection }
                 }
-
-                Section {
-                    Button { showPicker = true } label: {
-                        LabeledContent("Apps to lock", value: controller.selectedCount == 0 ? "None" : "\(controller.selectedCount) selected")
-                    }
-                } footer: {
-                    Text("These stay locked while your phone is folded.")
-                }
-
-                scheduleSection
-
-                Section {
-                    Text("""
-                    In Shortcuts, tap Automation → + → Display → Opened or Closed, and set each to Run Immediately:
-                    • Closed → Lock Apps
-                    • Opened → Unlock Apps
-                    """)
-                    .font(.footnote)
-                } header: {
-                    Text("Lock automatically when folded")
-                }
-
-                if showsDebug { debugSection }
             }
             .navigationTitle("Unfold")
         }
         .familyActivityPicker(isPresented: $showPicker, selection: $controller.selection)
-        .onHingeChange { _, new in
+        .fullScreenCover(isPresented: $isFlapping) {
+            FlapUnlockView().environmentObject(controller)
+        }
+        .onChange(of: controller.flapUnlockRequested, initial: true) { _, requested in
+            guard requested else { return }
+            controller.flapUnlockRequested = false
+            if controller.settings.canFlapUnlock(at: .now) { isFlapping = true }
+        }
+        .onHingeChange(isEnabled: !isFlapping) { _, new in
             hinge = new.hinge
-            followHinge()
+            controller.follow(hinge)
         }
     }
 
-    /// Re-evaluated every minute so the header follows the schedule while the app stays open.
-    private var statusHeader: some View {
-        TimelineView(.everyMinute) { context in
-            let isLocking = controller.settings.isLocking(at: context.date)
-            VStack(spacing: 8) {
-                Image(systemName: isLocking ? "lock.fill" : "lock.open.fill")
-                    .font(.system(size: 44))
-                    .foregroundStyle(.tint)
-                Text(isLocking ? "Apps locked" : "Apps unlocked")
-                    .font(.title2.bold())
-                Text(statusDetail(at: context.date))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
+    /// Sits on the list background rather than in a card, like a Settings header.
+    private func statusHeader(at date: Date, isLocked: Bool) -> some View {
+        Section {
+            VStack(spacing: 12) {
+                Image(systemName: isLocked ? "lock.fill" : "lock.open.fill")
+                    .font(.system(size: 56, weight: .semibold))
+                    .foregroundStyle(isLocked ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary))
+                    .contentTransition(.symbolEffect(.replace))
+                    .frame(height: 64)
+                VStack(spacing: 4) {
+                    Text(isLocked ? "Apps Locked" : "Apps Unlocked")
+                        .font(.title.bold())
+                    statusDetail(at: date)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                if controller.settings.canFlapUnlock(at: date) {
+                    Button { isFlapping = true } label: {
+                        Label("Flap Unlock", systemImage: "bird.fill")
+                            .font(.headline)
+                            // The header's tint style otherwise reaches the symbol, drawing it
+                            // blue on the blue button.
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 8)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.capsule)
+                    .controlSize(.large)
+                    .padding(.top, 8)
+                }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical)
+            .listRowBackground(Color.clear)
         }
     }
 
-    private func statusDetail(at date: Date) -> String {
-        if !controller.schedule.allows(date) { return "Outside your schedule, so folding won’t lock them." }
-        guard controller.settings.isEngaged else { return "Fold your phone to lock them." }
-        if controller.selectedCount == 0 { return "No apps chosen yet." }
-        if !isAuthorized { return "Screen Time access is off, so nothing is blocked." }
-        return "Unfold your phone to use them."
+    private func statusDetail(at date: Date) -> Text {
+        let settings = controller.settings
+        if settings.debugOverride != nil { return Text("Debug override is on.") }
+        if let until = settings.flapUnlockedUntil, date < until {
+            return Text("Flap Unlock ends in \(Text(until, style: .timer)).")
+        }
+        guard settings.isLocking(at: date) else {
+            return Text(controller.schedule.allows(date) ? "Fold your phone to lock them." : "Outside your schedule, so folding won’t lock them.")
+        }
+        if controller.selectedCount == 0 { return Text("No apps chosen yet.") }
+        if !isAuthorized { return Text("Screen Time access is off, so nothing is blocked.") }
+        return Text("Unfold your phone to use them.")
     }
 
     private var scheduleSection: some View {
         Section {
-            Toggle("Only on a schedule", isOn: $controller.schedule.isEnabled)
+            Toggle("Only on a Schedule", isOn: $controller.schedule.isEnabled)
             if controller.schedule.isEnabled {
                 DatePicker("From", selection: time(\.start), displayedComponents: .hourAndMinute)
                 DatePicker("Until", selection: time(\.end), displayedComponents: .hourAndMinute)
@@ -100,10 +146,10 @@ struct ContentView: View {
     private var scheduleFooter: String {
         // Before authorization every window is rejected; the Screen Time section already says why.
         if isAuthorized, let error = controller.scheduleError { return error }
-        guard controller.schedule.isEnabled else { return "Folding locks apps at any time." }
+        guard controller.schedule.isEnabled else { return "Folding locks apps at any time, and unfolding unlocks them." }
         if controller.schedule.weekdays.isEmpty { return "Pick at least one day, or folding won’t lock anything." }
-        if controller.schedule.isOvernight { return "Runs overnight, from the evening of each chosen day." }
-        return "Folding locks apps only during these hours."
+        let rule = "Folding locks apps only during these hours. Outside them, folding has no effect."
+        return controller.schedule.isOvernight ? rule + " Runs overnight, from the evening of each chosen day." : rule
     }
 
     private var weekdayPicker: some View {
@@ -149,18 +195,29 @@ struct ContentView: View {
             LabeledContent("Hinge", value: hingeLabel)
             LabeledContent("Screen Time", value: authLabel)
             LabeledContent("Last event", value: controller.lastEvent ?? "—")
-            Button("Lock Now") { controller.engage(source: "Debug") }
-            Button("Unlock Now") { controller.release(source: "Debug") }
+            LabeledContent("Override", value: controller.settings.debugOverride.map { $0 ? "Locked" : "Unlocked" } ?? "Off")
+            Button("Force Lock") { controller.overrideLock(true) }
+            Button("Force Unlock") { controller.overrideLock(false) }
+            Button("Clear Override") { controller.overrideLock(nil) }
+                .disabled(controller.settings.debugOverride == nil && controller.settings.flapUnlockedUntil == nil)
         }
     }
 
-    private func followHinge() {
-        guard let status = hinge?.status else { return }
-        // Only definite states move the lock; anything unknown leaves it untouched.
-        if status == .closed {
-            controller.engage(source: "Hinge (in app)")
-        } else if status == .partiallyOpen || status == .fullyOpen {
-            controller.release(source: "Hinge (in app)")
+    private var flapRuleSection: some View {
+        Section {
+            Stepper(value: $controller.flapRule.flaps, in: 1...50) {
+                LabeledContent("Flaps Needed", value: "\(controller.flapRule.flaps)")
+            }
+            Picker("Unlocks For", selection: $controller.flapRule.minutes) {
+                ForEach([15, 30, 45, 60, 90, 120], id: \.self) { minutes in
+                    Text(Duration.seconds(minutes * 60).formatted(.units(allowed: [.hours, .minutes], width: .wide)))
+                        .tag(minutes)
+                }
+            }
+        } header: {
+            Text("Flap Unlock")
+        } footer: {
+            Text(controller.flapUnlockError ?? "When your apps are locked, close and reopen your phone this many times in Unfold to unlock them for a while.")
         }
     }
 
