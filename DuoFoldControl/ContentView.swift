@@ -49,14 +49,13 @@ struct ContentView: View {
                     .disabled(isLocked)
 
                     Section {
-                        Text("""
-                        In Shortcuts, tap Automation → + → Display → Opened or Closed, and set each to Run Immediately:
-                        • Closed → Lock Apps
-                        • Opened → Unlock Apps
-                        """)
-                        .font(.footnote)
-                    } header: {
-                        Text("Lock Automatically When Folded")
+                        NavigationLink {
+                            AutomationGuideView()
+                        } label: {
+                            Label("Lock When Folded", systemImage: "wand.and.sparkles")
+                        }
+                    } footer: {
+                        Text("Set up two Shortcuts automations so folding locks apps even when Unfold isn’t open.")
                     }
 
                     if showsDebug { debugSection }
