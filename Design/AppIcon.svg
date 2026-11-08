@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Wobble the geometry, then eat into it with fine grain so strokes read as graphite -->
+    <filter id="graphite" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="7" result="warp"/>
+      <feDisplacementMap in="SourceGraphic" in2="warp" scale="10" xChannelSelector="R" yChannelSelector="G" result="rough"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="1" seed="2" result="grain"/>
+      <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.6 1.45" result="grainMask"/>
+      <feComposite in="rough" in2="grainMask" operator="in"/>
+    </filter>
+    <filter id="graphite2" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2" seed="19" result="warp"/>
+      <feDisplacementMap in="SourceGraphic" in2="warp" scale="9" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="paper">
+      <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" seed="4"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.35  0 0 0 0 0.3  0 0 0 0 0.25  0 0 0 0.09 0"/>
+    </filter>
+    <pattern id="hatch" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(-38)">
+      <line x1="0" y1="0" x2="0" y2="28" stroke="#2E2D33" stroke-width="9"/>
+    </pattern>
+    <pattern id="crosshatch" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(52)">
+      <line x1="0" y1="0" x2="0" y2="24" stroke="#2E2D33" stroke-width="8"/>
+    </pattern>
+    <clipPath id="leftHalf"><rect x="200" y="262" width="312" height="500" rx="58"/></clipPath>
+  </defs>
+
+  <!-- Paper -->
+  <rect width="1024" height="1024" fill="#F4EFE4"/>
+  <rect width="1024" height="1024" filter="url(#paper)"/>
+
+  <g transform="translate(512 512) scale(1.2) translate(-512 -512)">
+  <!-- Shading: the folded (locked) half is hatched in, the opened half stays clean paper -->
+  <g filter="url(#graphite)" opacity="0.38">
+    <rect x="200" y="262" width="312" height="500" fill="url(#hatch)" clip-path="url(#leftHalf)"/>
+  </g>
+
+  <g fill="none" stroke="#2E2D33" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Phone outline and hinge, drawn twice for a sketched double line -->
+    <g filter="url(#graphite)" stroke-width="26">
+      <rect x="200" y="262" width="624" height="500" rx="58"/>
+      <line x1="512" y1="266" x2="512" y2="758"/>
+    </g>
+    <g filter="url(#graphite2)" stroke-width="10" opacity="0.5">
+      <rect x="196" y="258" width="630" height="506" rx="60"/>
+      <line x1="516" y1="262" x2="509" y2="762"/>
+    </g>
+
+    <!-- Locked -->
+    <g filter="url(#graphite)" stroke-width="28">
+      <path d="M311 497 V452 A45 45 0 0 1 401 452 V497"/>
+      <rect x="281" y="497" width="150" height="120" rx="26"/>
+      <line x1="356" y1="542" x2="356" y2="574"/>
+    </g>
+
+    <!-- Unlocked -->
+    <g filter="url(#graphite)" stroke-width="28">
+      <path d="M623 497 V432 A45 45 0 0 1 713 432 V452"/>
+      <rect x="593" y="497" width="150" height="120" rx="26"/>
+      <line x1="668" y1="542" x2="668" y2="574"/>
+    </g>
+  </g>
+
+  <!-- Dense shading on the locked padlock body -->
+  <g filter="url(#graphite)" opacity="0.6">
+    <rect x="292" y="508" width="128" height="98" rx="18" fill="url(#crosshatch)"/>
+  </g>
+  </g>
+</svg>
