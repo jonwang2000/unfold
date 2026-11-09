@@ -2,6 +2,11 @@
 
 Folding your iPhone Duo locks the apps you choose. Unfolding unlocks them. Want in while it's folded? Open Unfold and flap the phone open and shut until it gives up.
 
+## Demo
+
+<img width="380" height="356" alt="demo" src="https://github.com/user-attachments/assets/d6828fe9-f29b-4a2f-b160-3a029e68e8f3" />
+
+
 ## What it does
 
 - **Fold to lock.** Picks apps with Screen Time and blocks them while the phone is closed.
