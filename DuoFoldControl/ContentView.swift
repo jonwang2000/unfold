@@ -9,14 +9,6 @@ struct ContentView: View {
     @State private var showPicker = false
     @State private var isFlapping = false
 
-    /// Developer tools show in every Debug build (what Xcode and `devicectl` install), however
-    /// the app is opened, and never in Release.
-    #if DEBUG
-    private let showsDebug = true
-    #else
-    private let showsDebug = false
-    #endif
-
     var body: some View {
         NavigationStack {
             // Re-evaluated every minute so the status and the settings lock follow the schedule
@@ -58,7 +50,10 @@ struct ContentView: View {
                         Text("Set up two Shortcuts automations so folding locks apps even when Unfold isn’t open.")
                     }
 
-                    if showsDebug { debugSection }
+                    // Every Debug build (what Xcode and `devicectl` install), never Release.
+                    #if DEBUG
+                    debugSection
+                    #endif
                 }
             }
             .navigationTitle("Unfold")

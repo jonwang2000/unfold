@@ -20,11 +20,8 @@ struct LockSettings: Codable, Equatable {
     private static let key = "settings"
 
     static func load() -> LockSettings {
-        guard let data = defaults.data(forKey: key),
-              let saved = try? JSONDecoder().decode(LockSettings.self, from: data) else {
-            return LockSettings()
-        }
-        return saved
+        guard let data = defaults.data(forKey: key) else { return LockSettings() }
+        return (try? JSONDecoder().decode(LockSettings.self, from: data)) ?? LockSettings()
     }
 
     func save() {
@@ -58,10 +55,10 @@ struct LockSettings: Codable, Equatable {
         store.shield.webDomains = selection.webDomainTokens.isEmpty ? nil : selection.webDomainTokens
     }
 
-    // Fields added after a release decode with their defaults, so updating never wipes the
-    // chosen apps.
     init() {}
 
+    /// Fields added after a release decode with their defaults, so updating never wipes the
+    /// chosen apps.
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let fallback = LockSettings()
