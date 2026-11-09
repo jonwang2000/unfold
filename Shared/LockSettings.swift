@@ -68,12 +68,17 @@ struct LockSettings: Codable, Equatable {
         debugOverride = try container.decodeIfPresent(Bool.self, forKey: .debugOverride)
         schedule = try container.decodeIfPresent(LockSchedule.self, forKey: .schedule) ?? fallback.schedule
         flapRule = try container.decodeIfPresent(FlapRule.self, forKey: .flapRule) ?? fallback.flapRule
+        // Saved before the minimum existed.
+        flapRule.flaps = max(flapRule.flaps, FlapRule.minimumFlaps)
     }
 }
 
 /// What a Flap Unlock costs: close and reopen the phone `flaps` times in the app to unlock for
 /// `minutes`.
 struct FlapRule: Codable, Equatable {
+    /// One flap is just unfolding, which would make Flap Unlock no different from opening the phone.
+    static let minimumFlaps = 2
+
     var flaps = 10
     /// DeviceActivity rejects intervals under 15 minutes, and the re-lock rides on one.
     var minutes = 15

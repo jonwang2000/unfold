@@ -199,7 +199,7 @@ struct ContentView: View {
 
     private var flapRuleSection: some View {
         Section {
-            Stepper(value: $controller.flapRule.flaps, in: 1...50) {
+            Stepper(value: $controller.flapRule.flaps, in: FlapRule.minimumFlaps...50) {
                 LabeledContent("Flaps Needed", value: "\(controller.flapRule.flaps)")
             }
             Picker("Unlocks For", selection: $controller.flapRule.minutes) {
